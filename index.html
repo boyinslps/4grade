@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的學習冒險地圖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #fff9eb;
+            background-image: radial-gradient(#ffd166 0.5px, transparent 0.5px);
+            background-size: 30px 30px;
+        }
+
+        .perspective {
+            perspective: 1200px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flip-card-inner.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 6px solid white;
+        }
+
+        .flip-card-front {
+            justify-content: center;
+        }
+
+        .flip-card-back {
+            transform: rotateY(180deg);
+            background-color: #ffffff;
+            padding: 2.5rem 1.2rem;
+            justify-content: flex-start;
+        }
+
+        /* 標題底線裝飾 */
+        .title-decoration {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        .title-decoration::after {
+            content: '';
+            position: absolute;
+            left: -10%;
+            bottom: 4px;
+            width: 120%;
+            height: 12px;
+            background: rgba(255, 209, 102, 0.4);
+            z-index: -1;
+            border-radius: 6px;
+        }
+
+        /* 列表項目排版優化 */
+        .skill-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+        .skill-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border-radius: 1rem;
+            text-align: left;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .skill-box:hover {
+            border-color: #e2e8f0;
+            background: #f1f5f9;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-6 md:p-12">
+    <div class="max-w-7xl mx-auto">
+        <!-- 標題區 -->
+        <header class="text-center mb-16">
+            <h1 class="text-6xl md:text-8xl font-black text-blue-600 mb-6 drop-shadow-md">本學期冒險地圖</h1>
+            <p class="text-2xl md:text-4xl text-orange-600 font-black bg-white inline-block px-8 py-3 rounded-full shadow-lg border-4 border-orange-200">
+                🌟 點一下卡片，看看有什麼冒險絕招！
+            </p>
+        </header>
+
+        <!-- 互動地圖容器 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-24">
+            
+            <!-- 第一關 -->
+            <div class="perspective h-[480px]">
+                <div class="flip-card-inner" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-front bg-blue-100 border-b-[12px] border-blue-500">
+                        <span class="text-2xl font-black text-blue-800 mb-4 bg-white px-4 py-1 rounded-full shadow-sm">【第一關】</span>
+                        <div class="text-9xl mb-6">☁️</div>
+                        <h2 class="text-4xl font-black text-gray-800">資訊搜查官</h2>
+                        <p class="text-2xl bg-blue-500 text-white px-6 py-2 rounded-xl mt-6 font-black">雲端與搜尋</p>
+                    </div>
+                    <div class="flip-card-back border-t-[12px] border-blue-500">
+                        <h3 class="font-black text-4xl text-blue-600 title-decoration">冒險絕招</h3>
+                        <div class="skill-list">
+                            <div class="skill-box"><span class="text-3xl">☁️</span><p class="text-xl font-bold text-gray-700 leading-tight">認識雲端：把檔案存在雲端裡</p></div>
+                            <div class="skill-box"><span class="text-3xl">📂</span><p class="text-xl font-bold text-gray-700 leading-tight">雲端管理：管理雲端資料夾</p></div>
+                            <div class="skill-box"><span class="text-3xl">🔎</span><p class="text-xl font-bold text-gray-700 leading-tight">搜尋技巧：精準關鍵字找答案</p></div>
+                            <div class="skill-box"><span class="text-3xl">🌐</span><p class="text-xl font-bold text-gray-700 leading-tight">網路安全：在網路上保護自己</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第二關 -->
+            <div class="perspective h-[480px]">
+                <div class="flip-card-inner" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-front bg-indigo-100 border-b-[12px] border-indigo-500">
+                        <span class="text-2xl font-black text-indigo-800 mb-4 bg-white px-4 py-1 rounded-full shadow-sm">【第二關】</span>
+                        <div class="text-9xl mb-6">📄</div>
+                        <h2 class="text-4xl font-black text-gray-800">文書記錄員</h2>
+                        <p class="text-2xl bg-indigo-500 text-white px-6 py-2 rounded-xl mt-6 font-black">Google 文件</p>
+                    </div>
+                    <div class="flip-card-back border-t-[12px] border-indigo-500">
+                        <h3 class="font-black text-4xl text-indigo-600 title-decoration">冒險絕招</h3>
+                        <div class="skill-list">
+                            <div class="skill-box"><span class="text-3xl">⌨️</span><p class="text-xl font-bold text-gray-700 leading-tight">練習打字變快、變準</p></div>
+                            <div class="skill-box"><span class="text-3xl">🎨</span><p class="text-xl font-bold text-gray-700 leading-tight">標題、表格收納文章</p></div>
+                            <div class="skill-box"><span class="text-3xl">🤝</span><p class="text-xl font-bold text-gray-700 leading-tight">跟同學一起寫同一份作業</p></div>
+                            <div class="skill-box"><span class="text-3xl">📁</span><p class="text-xl font-bold text-gray-700 leading-tight">把寫好的故事存起來</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第三關 -->
+            <div class="perspective h-[480px]">
+                <div class="flip-card-inner" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-front bg-orange-100 border-b-[12px] border-orange-400">
+                        <span class="text-2xl font-black text-orange-800 mb-4 bg-white px-4 py-1 rounded-full shadow-sm">【第三關】</span>
+                        <div class="text-9xl mb-6">📊</div>
+                        <h2 class="text-4xl font-black text-gray-800">簡報設計師</h2>
+                        <p class="text-2xl bg-orange-400 text-white px-6 py-2 rounded-xl mt-6 font-black">Google 簡報</p>
+                    </div>
+                    <div class="flip-card-back border-t-[12px] border-orange-400">
+                        <h3 class="font-black text-4xl text-orange-600 title-decoration">冒險絕招</h3>
+                        <div class="skill-list">
+                            <div class="skill-box"><span class="text-3xl">🖼️</span><p class="text-xl font-bold text-gray-700 leading-tight">放上圖片讓簡報更精彩</p></div>
+                            <div class="skill-box"><span class="text-3xl">✨</span><p class="text-xl font-bold text-gray-700 leading-tight">加入厲害的動畫效果</p></div>
+                            <div class="skill-box"><span class="text-3xl">🎤</span><p class="text-xl font-bold text-gray-700 leading-tight">練習在大家面前說故事</p></div>
+                            <div class="skill-box"><span class="text-3xl">📐</span><p class="text-xl font-bold text-gray-700 leading-tight">把內容排得整齊又好讀</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第四關 -->
+            <div class="perspective h-[480px]">
+                <div class="flip-card-inner" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-front bg-green-100 border-b-[12px] border-green-500">
+                        <span class="text-2xl font-black text-green-800 mb-4 bg-white px-4 py-1 rounded-full shadow-sm">【第四關】</span>
+                        <div class="text-9xl mb-6">📍</div>
+                        <h2 class="text-4xl font-black text-gray-800">程式建築師</h2>
+                        <p class="text-2xl bg-green-500 text-white px-6 py-2 rounded-xl mt-6 font-black">Scratch 程式</p>
+                    </div>
+                    <div class="flip-card-back border-t-[12px] border-green-500">
+                        <h3 class="font-black text-4xl text-green-600 title-decoration">冒險絕招</h3>
+                        <div class="skill-list">
+                            <div class="skill-box"><span class="text-3xl">🏠</span><p class="text-xl font-bold text-gray-700 leading-tight">用程式介紹家鄉的好地方</p></div>
+                            <div class="skill-box"><span class="text-3xl">🗺️</span><p class="text-xl font-bold text-gray-700 leading-tight">製作可以點選的互動地圖</p></div>
+                            <div class="skill-box"><span class="text-3xl">📸</span><p class="text-xl font-bold text-gray-700 leading-tight">幫景點配上照片介紹文字</p></div>
+                            <div class="skill-box"><span class="text-3xl">🗣️</span><p class="text-xl font-bold text-gray-700 leading-tight">讓角色導覽說故事給你聽</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 每日裝備區 -->
+        <div class="bg-white rounded-[4rem] p-12 shadow-2xl max-w-3xl mx-auto border-8 border-yellow-400 relative overflow-hidden">
+            <div class="flex items-center justify-center gap-8 mb-12">
+                <div class="bg-yellow-400 p-6 rounded-3xl shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                </div>
+                <h2 class="text-5xl font-black text-gray-800">🎒 每日必帶裝備</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="flex items-center gap-6 p-8 bg-green-50 rounded-3xl border-4 border-green-100 shadow-sm">
+                    <div class="w-20 h-20 flex items-center justify-center bg-white rounded-full text-5xl border-2 border-green-200">🏫</div>
+                    <span class="text-3xl font-black text-green-800">Google 教室</span>
+                </div>
+                <div class="flex items-center gap-6 p-8 bg-blue-50 rounded-3xl border-4 border-blue-100 shadow-sm">
+                    <div class="w-20 h-20 flex items-center justify-center bg-white rounded-full text-5xl border-2 border-blue-200">🕹️</div>
+                    <span class="text-3xl font-black text-blue-800">Egame 平台</span>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-24 text-center text-gray-400 text-2xl font-black italic pb-12">
+            🚩 冒險者，準備好挑戰關卡了嗎？加油！
+        </footer>
+    </div>
+</body>
+</html>
