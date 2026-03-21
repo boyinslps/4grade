@@ -1,230 +1,306 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的學習冒險地圖</title>
+    <title>AI Magic Prompt Builder</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap');
         
         body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #fff9eb;
-            background-image: radial-gradient(#ffd166 0.5px, transparent 0.5px);
-            background-size: 30px 30px;
+            font-family: 'Lexend', 'Noto Sans TC', sans-serif;
+            background-color: #f0f9ff;
         }
 
-        .perspective {
-            perspective: 1200px;
-        }
-
-        .flip-card-inner {
+        .custom-select-container {
             position: relative;
+            /* 確保容器本身有層級意識 */
+            z-index: 10;
+        }
+
+        /* 當容器內部的輸入框被聚焦時，提高該容器的層級 */
+        .custom-select-container:focus-within {
+            z-index: 50;
+        }
+
+        .dropdown-list {
+            display: none;
+            position: absolute;
+            z-index: 100; /* 高於所有輸入框 */
             width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-style: preserve-3d;
+            max-height: 250px;
+            overflow-y: auto;
+            background: white;
+            border: 2px solid #3b82f6;
+            border-radius: 0.75rem;
+            margin-top: 4px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        .dropdown-list.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
             cursor: pointer;
+            font-size: 1.25rem;
+            border-bottom: 1px solid #f1f5f9;
         }
 
-        .flip-card-inner.flipped {
-            transform: rotateY(180deg);
+        .dropdown-item:last-child {
+            border-bottom: none;
         }
 
-        .flip-card-front, .flip-card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            border-radius: 2.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            border: 6px solid white;
+        .dropdown-item:hover {
+            background-color: #e0f2fe;
         }
 
-        .flip-card-front {
-            justify-content: center;
-        }
-
-        .flip-card-back {
-            transform: rotateY(180deg);
-            background-color: #ffffff;
-            padding: 2.5rem 1.2rem;
-            justify-content: flex-start;
-        }
-
-        /* 標題底線裝飾 */
-        .title-decoration {
+        .category-card {
+            transition: transform 0.2s;
             position: relative;
-            display: inline-block;
-            margin-bottom: 1.5rem;
-        }
-        .title-decoration::after {
-            content: '';
-            position: absolute;
-            left: -10%;
-            bottom: 4px;
-            width: 120%;
-            height: 12px;
-            background: rgba(255, 209, 102, 0.4);
-            z-index: -1;
-            border-radius: 6px;
         }
 
-        /* 列表項目排版優化 */
-        .skill-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 100%;
-        }
-        .skill-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            background: #f8fafc;
-            border-radius: 1rem;
-            text-align: left;
-            border: 2px solid transparent;
-            transition: all 0.2s;
-        }
-        .skill-box:hover {
-            border-color: #e2e8f0;
-            background: #f1f5f9;
-        }
+        /* 這裡很關鍵：確保後面的卡片不會蓋過前面卡片的下拉選單 */
+        .grid > div:nth-child(1) { z-index: 40; }
+        .grid > div:nth-child(2) { z-index: 30; }
+        .grid > div:nth-child(3) { z-index: 20; }
+        .grid > div:nth-child(4) { z-index: 10; }
     </style>
 </head>
-<body class="min-h-screen p-6 md:p-12">
-    <div class="max-w-7xl mx-auto">
-        <!-- 標題區 -->
-        <header class="text-center mb-16">
-            <h1 class="text-6xl md:text-8xl font-black text-blue-600 mb-6 drop-shadow-md">本學期冒險地圖</h1>
-            <p class="text-2xl md:text-4xl text-orange-600 font-black bg-white inline-block px-8 py-3 rounded-full shadow-lg border-4 border-orange-200">
-                🌟 點一下卡片，看看有什麼冒險絕招！
-            </p>
+<body class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-blue-600 mb-2">✨ AI Magic Prompt Builder ✨</h1>
+            <p class="text-xl text-gray-600">Pick your favorite words to create amazing AI images!</p>
         </header>
 
-        <!-- 互動地圖容器 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-24">
+        <!-- Main Interface -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             
-            <!-- 第一關 -->
-            <div class="perspective h-[480px]">
-                <div class="flip-card-inner" onclick="this.classList.toggle('flipped')">
-                    <div class="flip-card-front bg-blue-100 border-b-[12px] border-blue-500">
-                        <span class="text-2xl font-black text-blue-800 mb-4 bg-white px-4 py-1 rounded-full shadow-sm">【第一關】</span>
-                        <div class="text-9xl mb-6">☁️</div>
-                        <h2 class="text-4xl font-black text-gray-800">資訊搜查官</h2>
-                        <p class="text-2xl bg-blue-500 text-white px-6 py-2 rounded-xl mt-6 font-black">雲端與搜尋</p>
-                    </div>
-                    <div class="flip-card-back border-t-[12px] border-blue-500">
-                        <h3 class="font-black text-4xl text-blue-600 title-decoration">冒險絕招</h3>
-                        <div class="skill-list">
-                            <div class="skill-box"><span class="text-3xl">☁️</span><p class="text-xl font-bold text-gray-700 leading-tight">認識雲端：把檔案存在雲端裡</p></div>
-                            <div class="skill-box"><span class="text-3xl">📂</span><p class="text-xl font-bold text-gray-700 leading-tight">雲端管理：管理雲端資料夾</p></div>
-                            <div class="skill-box"><span class="text-3xl">🔎</span><p class="text-xl font-bold text-gray-700 leading-tight">搜尋技巧：精準關鍵字找答案</p></div>
-                            <div class="skill-box"><span class="text-3xl">🌐</span><p class="text-xl font-bold text-gray-700 leading-tight">網路安全：在網路上保護自己</p></div>
-                        </div>
-                    </div>
+            <!-- Category: WHO -->
+            <div class="category-card bg-white p-6 rounded-2xl shadow-sm border-2 border-blue-100">
+                <label class="block text-2xl font-bold text-blue-500 mb-3">👤 Who</label>
+                <div class="custom-select-container" id="who-container">
+                    <input type="text" id="who-input" placeholder="Search or type..." 
+                        class="w-full text-xl p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400">
+                    <div id="who-list" class="dropdown-list"></div>
                 </div>
             </div>
 
-            <!-- 第二關 -->
-            <div class="perspective h-[480px]">
-                <div class="flip-card-inner" onclick="this.classList.toggle('flipped')">
-                    <div class="flip-card-front bg-indigo-100 border-b-[12px] border-indigo-500">
-                        <span class="text-2xl font-black text-indigo-800 mb-4 bg-white px-4 py-1 rounded-full shadow-sm">【第二關】</span>
-                        <div class="text-9xl mb-6">📄</div>
-                        <h2 class="text-4xl font-black text-gray-800">文書記錄員</h2>
-                        <p class="text-2xl bg-indigo-500 text-white px-6 py-2 rounded-xl mt-6 font-black">Google 文件</p>
-                    </div>
-                    <div class="flip-card-back border-t-[12px] border-indigo-500">
-                        <h3 class="font-black text-4xl text-indigo-600 title-decoration">冒險絕招</h3>
-                        <div class="skill-list">
-                            <div class="skill-box"><span class="text-3xl">⌨️</span><p class="text-xl font-bold text-gray-700 leading-tight">練習打字變快、變準</p></div>
-                            <div class="skill-box"><span class="text-3xl">🎨</span><p class="text-xl font-bold text-gray-700 leading-tight">標題、表格收納文章</p></div>
-                            <div class="skill-box"><span class="text-3xl">🤝</span><p class="text-xl font-bold text-gray-700 leading-tight">跟同學一起寫同一份作業</p></div>
-                            <div class="skill-box"><span class="text-3xl">📁</span><p class="text-xl font-bold text-gray-700 leading-tight">把寫好的故事存起來</p></div>
-                        </div>
-                    </div>
+            <!-- Category: WHERE -->
+            <div class="category-card bg-white p-6 rounded-2xl shadow-sm border-2 border-green-100">
+                <label class="block text-2xl font-bold text-green-500 mb-3">📍 Where</label>
+                <div class="custom-select-container" id="where-container">
+                    <input type="text" id="where-input" placeholder="Search or type..." 
+                        class="w-full text-xl p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-400">
+                    <div id="where-list" class="dropdown-list"></div>
                 </div>
             </div>
 
-            <!-- 第三關 -->
-            <div class="perspective h-[480px]">
-                <div class="flip-card-inner" onclick="this.classList.toggle('flipped')">
-                    <div class="flip-card-front bg-orange-100 border-b-[12px] border-orange-400">
-                        <span class="text-2xl font-black text-orange-800 mb-4 bg-white px-4 py-1 rounded-full shadow-sm">【第三關】</span>
-                        <div class="text-9xl mb-6">📊</div>
-                        <h2 class="text-4xl font-black text-gray-800">簡報設計師</h2>
-                        <p class="text-2xl bg-orange-400 text-white px-6 py-2 rounded-xl mt-6 font-black">Google 簡報</p>
-                    </div>
-                    <div class="flip-card-back border-t-[12px] border-orange-400">
-                        <h3 class="font-black text-4xl text-orange-600 title-decoration">冒險絕招</h3>
-                        <div class="skill-list">
-                            <div class="skill-box"><span class="text-3xl">🖼️</span><p class="text-xl font-bold text-gray-700 leading-tight">放上圖片讓簡報更精彩</p></div>
-                            <div class="skill-box"><span class="text-3xl">✨</span><p class="text-xl font-bold text-gray-700 leading-tight">加入厲害的動畫效果</p></div>
-                            <div class="skill-box"><span class="text-3xl">🎤</span><p class="text-xl font-bold text-gray-700 leading-tight">練習在大家面前說故事</p></div>
-                            <div class="skill-box"><span class="text-3xl">📐</span><p class="text-xl font-bold text-gray-700 leading-tight">把內容排得整齊又好讀</p></div>
-                        </div>
-                    </div>
+            <!-- Category: WHAT -->
+            <div class="category-card bg-white p-6 rounded-2xl shadow-sm border-2 border-yellow-100">
+                <label class="block text-2xl font-bold text-yellow-600 mb-3">🏃 What</label>
+                <div class="custom-select-container" id="what-container">
+                    <input type="text" id="what-input" placeholder="Search or type..." 
+                        class="w-full text-xl p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-yellow-400">
+                    <div id="what-list" class="dropdown-list"></div>
                 </div>
             </div>
 
-            <!-- 第四關 -->
-            <div class="perspective h-[480px]">
-                <div class="flip-card-inner" onclick="this.classList.toggle('flipped')">
-                    <div class="flip-card-front bg-green-100 border-b-[12px] border-green-500">
-                        <span class="text-2xl font-black text-green-800 mb-4 bg-white px-4 py-1 rounded-full shadow-sm">【第四關】</span>
-                        <div class="text-9xl mb-6">📍</div>
-                        <h2 class="text-4xl font-black text-gray-800">程式建築師</h2>
-                        <p class="text-2xl bg-green-500 text-white px-6 py-2 rounded-xl mt-6 font-black">Scratch 程式</p>
-                    </div>
-                    <div class="flip-card-back border-t-[12px] border-green-500">
-                        <h3 class="font-black text-4xl text-green-600 title-decoration">冒險絕招</h3>
-                        <div class="skill-list">
-                            <div class="skill-box"><span class="text-3xl">🏠</span><p class="text-xl font-bold text-gray-700 leading-tight">用程式介紹家鄉的好地方</p></div>
-                            <div class="skill-box"><span class="text-3xl">🗺️</span><p class="text-xl font-bold text-gray-700 leading-tight">製作可以點選的互動地圖</p></div>
-                            <div class="skill-box"><span class="text-3xl">📸</span><p class="text-xl font-bold text-gray-700 leading-tight">幫景點配上照片介紹文字</p></div>
-                            <div class="skill-box"><span class="text-3xl">🗣️</span><p class="text-xl font-bold text-gray-700 leading-tight">讓角色導覽說故事給你聽</p></div>
-                        </div>
-                    </div>
+            <!-- Category: STYLE -->
+            <div class="category-card bg-white p-6 rounded-2xl shadow-sm border-2 border-purple-100">
+                <label class="block text-2xl font-bold text-purple-500 mb-3">🎨 Style</label>
+                <div class="custom-select-container" id="style-container">
+                    <input type="text" id="style-input" placeholder="Search or type..." 
+                        class="w-full text-xl p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-400">
+                    <div id="style-list" class="dropdown-list"></div>
                 </div>
             </div>
 
         </div>
 
-        <!-- 每日裝備區 -->
-        <div class="bg-white rounded-[4rem] p-12 shadow-2xl max-w-3xl mx-auto border-8 border-yellow-400 relative overflow-hidden">
-            <div class="flex items-center justify-center gap-8 mb-12">
-                <div class="bg-yellow-400 p-6 rounded-3xl shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
-                </div>
-                <h2 class="text-5xl font-black text-gray-800">🎒 每日必帶裝備</h2>
+        <!-- Output Section -->
+        <div class="bg-blue-600 p-8 rounded-3xl text-white shadow-xl relative z-0">
+            <h2 class="text-2xl font-bold mb-4 flex items-center">
+                <span class="mr-2">📝</span> Magic Prompt
+            </h2>
+            <div id="prompt-output" class="bg-blue-700/50 p-6 rounded-xl text-3xl md:text-4xl min-h-[100px] mb-6 font-medium break-words border border-blue-400">
+                Waiting for magic...
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="flex items-center gap-6 p-8 bg-green-50 rounded-3xl border-4 border-green-100 shadow-sm">
-                    <div class="w-20 h-20 flex items-center justify-center bg-white rounded-full text-5xl border-2 border-green-200">🏫</div>
-                    <span class="text-3xl font-black text-green-800">Google 教室</span>
-                </div>
-                <div class="flex items-center gap-6 p-8 bg-blue-50 rounded-3xl border-4 border-blue-100 shadow-sm">
-                    <div class="w-20 h-20 flex items-center justify-center bg-white rounded-full text-5xl border-2 border-blue-200">🕹️</div>
-                    <span class="text-3xl font-black text-blue-800">Egame 平台</span>
-                </div>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button onclick="copyPrompt()" class="flex-1 bg-white text-blue-600 text-2xl font-bold py-4 px-8 rounded-2xl hover:bg-blue-50 transition active:scale-95 flex justify-center items-center">
+                    <span id="copy-btn-text">📋 Copy Prompt</span>
+                </button>
+                <button onclick="resetAll()" class="sm:w-1/4 bg-blue-500 text-white text-xl font-bold py-4 px-6 rounded-2xl hover:bg-blue-400 transition">
+                    🔄 Reset
+                </button>
             </div>
         </div>
 
-        <footer class="mt-24 text-center text-gray-400 text-2xl font-black italic pb-12">
-            🚩 冒險者，準備好挑戰關卡了嗎？加油！
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-gray-500 pb-8">
+            <p>A simple AI prompt tool for elementary students.</p>
         </footer>
     </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-8 py-4 rounded-full text-xl hidden shadow-2xl z-[200]">
+        Copied to clipboard!
+    </div>
+
+    <script>
+        const data = {
+            who: [
+                {en: "adult"}, {en: "angel"}, {en: "baby"},
+                {en: "boy"}, {en: "child"}, {en: "couple"},
+                {en: "customer"}, {en: "genius"}, {en: "gentleman"},
+                {en: "giant"}, {en: "girl"}, {en: "hero"},
+                {en: "king"}, {en: "lady"}, {en: "neighbor"},
+                {en: "partner"}, {en: "prince"}, {en: "princess"},
+                {en: "queen"}, {en: "stranger"}
+            ],
+            where: [
+                {en: "bakery"}, {en: "bank"}, {en: "beach"},
+                {en: "bookstore"}, {en: "church"}, {en: "factory"},
+                {en: "hospital"}, {en: "hotel"}, {en: "museum"},
+                {en: "park"}, {en: "airport"}, {en: "train station"},
+                {en: "farm"}, {en: "zoo"}, {en: "garden"},
+                {en: "kitchen"}, {en: "library"}, {en: "playground"},
+                {en: "classroom"}, {en: "castle"}
+            ],
+            what: [
+                {en: "baking"}, {en: "cooking"}, {en: "eating"},
+                {en: "climbing"}, {en: "dancing"}, {en: "drawing"},
+                {en: "fishing"}, {en: "hiking"}, {en: "jogging"},
+                {en: "running"}, {en: "sailing"}, {en: "singing"},
+                {en: "skating"}, {en: "skiing"}, {en: "surfing"},
+                {en: "swimming"}, {en: "traveling"}, {en: "teaching"},
+                {en: "reading"}, {en: "playing"}
+            ],
+            style: [
+                {en: "3D Cartoon", zh: "3D 卡通"}, {en: "Pixar Style", zh: "皮克斯風"},
+                {en: "Studio Ghibli Style", zh: "吉卜力風"}, {en: "Pixel Art", zh: "像素遊戲"},
+                {en: "Lego Brick Style", zh: "樂高積木"}, {en: "Watercolor Painting", zh: "水彩畫"},
+                {en: "Crayon Drawing", zh: "蠟筆畫"}, {en: "Claymation", zh: "黏土動畫"},
+                {en: "Kawaii Sticker", zh: "可愛貼紙"}, {en: "Pop Art", zh: "普普藝術"},
+                {en: "Paper Cutout", zh: "紙雕剪紙"}, {en: "Oil Painting", zh: "油畫風"},
+                {en: "Chalk Art", zh: "粉筆畫"}, {en: "Anime Style", zh: "日系動漫"},
+                {en: "Pencil Sketch", zh: "鉛筆素描"}, {en: "Fantasy Magic", zh: "奇幻魔法"},
+                {en: "Cyberpunk", zh: "科幻未來"}, {en: "Isometric View", zh: "立體模型"},
+                {en: "Felted Wool", zh: "羊毛氈"}, {en: "Glowing Neon", zh: "霓虹發光"}
+            ]
+        };
+
+        const selections = { who: "", where: "", what: "", style: "" };
+
+        function initDropdowns() {
+            Object.keys(data).forEach(cat => {
+                const input = document.getElementById(`${cat}-input`);
+                const list = document.getElementById(`${cat}-list`);
+
+                input.addEventListener('focus', () => {
+                    renderList(cat, input.value);
+                    list.classList.add('show');
+                });
+
+                input.addEventListener('input', () => {
+                    renderList(cat, input.value);
+                    selections[cat] = input.value;
+                    updatePrompt();
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!document.getElementById(`${cat}-container`).contains(e.target)) {
+                        list.classList.remove('show');
+                    }
+                });
+            });
+        }
+
+        function renderList(cat, filter = "") {
+            const list = document.getElementById(`${cat}-list`);
+            list.innerHTML = "";
+            
+            const filtered = data[cat].filter(item => 
+                item.en.toLowerCase().includes(filter.toLowerCase()) ||
+                (item.zh && item.zh.includes(filter))
+            );
+
+            filtered.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "dropdown-item flex justify-between items-center";
+                
+                // Style 顯示中文，其他只顯示英文
+                if (cat === 'style' && item.zh) {
+                    div.innerHTML = `<span class="font-bold">${item.en}</span><span class="text-gray-400 text-sm italic">${item.zh}</span>`;
+                } else {
+                    div.innerHTML = `<span class="font-bold">${item.en}</span>`;
+                }
+
+                div.onclick = () => {
+                    document.getElementById(`${cat}-input`).value = item.en;
+                    selections[cat] = item.en;
+                    document.getElementById(`${cat}-list`).classList.remove('show');
+                    updatePrompt();
+                };
+                list.appendChild(div);
+            });
+        }
+
+        function updatePrompt() {
+            const { who, where, what, style } = selections;
+            let promptParts = [];
+            
+            if (who) promptParts.push(`A ${who}`);
+            if (what) promptParts.push(what);
+            if (where) promptParts.push(`in the ${where}`);
+            if (style) promptParts.push(`, in ${style} style`);
+
+            const finalPrompt = promptParts.join(' ');
+            const output = document.getElementById('prompt-output');
+            
+            if (finalPrompt.trim() === "") {
+                output.innerText = "Waiting for magic...";
+                output.classList.add('text-gray-300');
+            } else {
+                output.innerText = finalPrompt + ".";
+                output.classList.remove('text-gray-300');
+            }
+        }
+
+        function copyPrompt() {
+            const text = document.getElementById('prompt-output').innerText;
+            if (text === "Waiting for magic...") return;
+
+            const tempInput = document.createElement("input");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            showToast();
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 2000);
+        }
+
+        function resetAll() {
+            Object.keys(selections).forEach(cat => {
+                selections[cat] = "";
+                document.getElementById(`${cat}-input`).value = "";
+            });
+            updatePrompt();
+        }
+
+        window.onload = initDropdowns;
+    </script>
 </body>
 </html>
